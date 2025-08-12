@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { config, validateConfig } from './config';
+import { SupabaseError, PossibleError } from '@/types/supabase';
 
 // Validate configuration on import
 validateConfig();
@@ -9,25 +10,18 @@ export const supabaseClient = createClient(
   config.supabase.serviceKey!
 );
 
-// Type for Supabase error
-export interface SupabaseError {
-  message: string;
-  details?: string;
-  hint?: string;
-  code?: string;
-}
-
 // Helper function to handle Supabase errors
-export function handleSupabaseError(error: any): SupabaseError {
-  if (error?.message) {
+export function handleSupabaseError(error: PossibleError): SupabaseError {
+  if (error && typeof error === 'object' && 'message' in error) {
+    const e = error as { message?: string; details?: string; hint?: string; code?: string };
     return {
-      message: error.message,
-      details: error.details,
-      hint: error.hint,
-      code: error.code,
+      message: e.message ?? 'An unexpected error occurred',
+      details: e.details,
+      hint: e.hint,
+      code: e.code,
     };
   }
-  
+
   return {
     message: 'An unexpected error occurred',
   };
