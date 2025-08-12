@@ -4,8 +4,10 @@ import { editSourceSchema } from '@/lib/validation';
 
 export async function PUT(
   req: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await context.params;
+
   try {
     const body = await req.json();
 
@@ -24,7 +26,7 @@ export async function PUT(
     const { data, error } = await supabaseClient
       .from('rag_sources')
       .update(validationResult.data)
-      .eq('source_id', params.id)
+      .eq('source_id', id)
       .select();
 
     if (error) {

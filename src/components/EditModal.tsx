@@ -69,7 +69,7 @@ export const EditModal: React.FC<EditModalProps> = ({
       };
 
       await onSave(cleanedData);
-    } catch (error) {
+    } catch {
       // Error handling is done in the parent component
     }
   };
